@@ -41,7 +41,11 @@ const getProducts = async(req, res) => {
     //Make express understand
     const parse = qs.parse(req.query);
 
-    const features = new apiFeatures(Product.find(), parse).filter().sort().limitFields().paginate();
+    const features = new apiFeatures(Product.find(), parse)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
     let product = await features.query;
     
     // let queryObj = {...parse};
@@ -88,7 +92,10 @@ const getProducts = async(req, res) => {
 
     //let product = await query;
 
-    res.status(200).json(product);
+    res.status(200).json({
+      length: product.length,
+      product
+    });
 
   } catch(error) {
     console.log(error);
