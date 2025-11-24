@@ -1,5 +1,6 @@
 const Product = require('../model/productModel');
 const qs = require('qs');
+const apiFeatures = require('../utils/apiFeatures');
 
 const addProductToDatabase = async(req, res) => {
   try{
@@ -39,46 +40,53 @@ const getProducts = async(req, res) => {
   try{
     //Make express understand
     const parse = qs.parse(req.query);
-    let queryObj = {...parse};
 
-    const exclude = ['fields', 'sort', 'page', 'limit'];
-
-    exclude.forEach(el => delete queryObj[el]);
-
-    let queryStr = JSON.stringify(queryObj);
+    const features = new apiFeatures(Product.find(), parse).filter().sort().limitFields().paginate();
+    let product = await features.query;
     
-    let gottenStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    // let queryObj = {...parse};
 
-    let queryObject = JSON.parse(gottenStr);
+    // const exclude = ['fields', 'sort', 'page', 'limit'];
 
-    //Filter by name
-    let query = Product.find(queryObject);
+    // exclude.forEach(el => delete queryObj[el]);
 
     //Filter by fields
-    if(req.query.fields) {
-      const fields = req.query.fields?.split(",").join(" ");
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v");
-    }
+    
+    // if(req.query.fields) {
+    //   const fields = req.query.fields.split(",").join(" ");
+    //   query = query.select(fields);
+    // } else {
+    //   query = query.select("-__v");
+    // }
     
     //Sort the fields
-    if(req.query.sort) {
-      const sort = req.query.sort.split(",").join(" ");
-      query = query.sort(sort);
-    } else {
-      query = query.sort("-createdAt");
-    }
+    
+    // if(req.query.sort) {
+    //   const sort = req.query.sort.split(",").join(" ");
+    //   query = query.sort(sort);
+    // } else {
+    //   query = query.sort("-createdAt");
+    // }
+      
 
     //Sort and paginate
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 3;
+   
+    // const page = Number(req.query.page) || 1;
+    // const limit = Number(req.query.limit) || 3;
 
-    const skip = (page - 1) * limit;
+    // const skip = (page - 1) * limit;
 
-    query = query.skip(skip).limit(limit);
+    // query = query.skip(skip).limit(limit);
+   
+    // if(req.query.page) {
+    //   const count = await Product.countDocuments();
+    //   if(skip >= count) {
+    //     throw new Error("Page not found");
+    //   }
+    // }
+    
 
-    let product = await query;
+    //let product = await query;
 
     res.status(200).json(product);
 
