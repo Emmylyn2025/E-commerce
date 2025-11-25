@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const router = require('./routes/router');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -14,6 +15,7 @@ mongoose.connect(process.env.monCONN).then(() => {
 
 //Middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use('/api/e-commerce', router);
 
 const PORT = process.env.PORT;

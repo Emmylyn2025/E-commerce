@@ -106,6 +106,37 @@ const getProducts = async(req, res) => {
   }
 }
 
+const getProductsStats = async(req, res) => {
+  try{
+    const stats = await Product.aggregate([
+      { $match: {price: {$gte: 4000}}},
+      { $group : {
+        _id: '$name',
+        avgPrice: {$avg: '$price'},
+        maxPrice: {$max: '$price'},
+        minprice: {$min: '$price'},
+        totalPrice: {$sum: '$price'},
+        productCount: {$sum: 1}
+      }},
+      { $sort: { maxPrice: 1 }}
+    ]);
+
+    res.status(200).json({
+      status: 'Success',
+      count: stats.length,
+      message: {
+        stats
+      }
+    });
+
+  } catch(error) {
+    res.status(500).json({
+      status: 'fail',
+      message: error.message
+    });
+  }
+}
+
 const updateProduct = async(req, res) => {
   try{
 
@@ -156,4 +187,4 @@ const deleteProduct = async(req, res) => {
   }
 }
 
-module.exports = { addProductToDatabase, getProducts, updateProduct, deleteProduct };
+module.exports = { addProductToDatabase, getProducts, updateProduct, deleteProduct, getProductsStats };
