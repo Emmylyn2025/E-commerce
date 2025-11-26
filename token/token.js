@@ -4,14 +4,14 @@ function generateToken(user) {
   //Access token
   const accessToken = jwt.sign({
     id: user._id,
-    username: user.username,
+    username: user.firstname,
     email: user.email,
     role: user.role
   }, process.env.accessToken, {expiresIn: "15m"});
 
   const refreshToken = jwt.sign({
     id: user._id,
-    username: user.username,
+    username: user.firstname,
     email: user.email,
     role: user.role
   }, process.env.refreshToken, {expiresIn: "7d"});

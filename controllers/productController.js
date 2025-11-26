@@ -1,13 +1,27 @@
 const Product = require('../model/productModel');
 const qs = require('qs');
 const apiFeatures = require('../utils/apiFeatures');
+const {uploadToCloudinary} = require('../Cloudinary/cloudinaryHelpers');
 
 const addProductToDatabase = async(req, res) => {
   try{
 
-    const {name, description, price, category, brand} = req.body;
+    const {name, description, price, category, brand} = JSON.parse(req.body.details);
+
+    //Check if file is present
+    if(!req.file) {
+      return res.status(400).json({
+        status: 'Fail',
+        message: "An image needs to be uploaded"
+      });
+    }
+
+    //Upload to cloudinary
+    const {imageUrl, imagePublicId} = await uploadToCloudinary(req.file.path);
 
     const product = await Product.create({
+      imageUrl,
+      imagePublicId,
       name,
       description,
       price,
@@ -17,11 +31,12 @@ const addProductToDatabase = async(req, res) => {
 
     if(!product) {
       return res.status(400).json({
+        success: 'Fail',
         message: "You've made some bad request"
       });
     }
 
-    res.status(200).json({
+    res.status(201).json({
       message: "product created successfully",
       product
     });

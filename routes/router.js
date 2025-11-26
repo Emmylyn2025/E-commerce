@@ -6,6 +6,8 @@ const {registerUser, loginUser, refresh, logOut, decodeToken} = require('../cont
 
 const {authController, adminController} = require('../Middleware/userMiddleware');
 
+const multerMiddleware = require('../multer/multer');
+
 const router = express.Router();
 
 //User ability routes
@@ -18,7 +20,7 @@ router.post('/logout', logOut);
 router.get('/decode', authController, decodeToken);
 
 //Admin ability routes
-router.post('/addproduct', authController, adminController, addProductToDatabase);
+router.post('/addproduct', authController, adminController, multerMiddleware.single('image'), addProductToDatabase);
 router.get('/getproduct', authController, adminController, getProducts);
 router.get('/stats', authController, adminController, getProductsStats);
 router.patch('/updateproduct/:id', authController, adminController, updateProduct);

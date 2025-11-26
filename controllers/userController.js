@@ -5,10 +5,10 @@ const jwt = require('jsonwebtoken');
 const registerUser = async(req, res) => {
   try{
 
-    const {username, email, password, address, phone} = req.body;
+    const {firstname, lastname, email, password, address, phone} = req.body;
 
     //Check if the user exists in the databse before
-    const user = await User.findOne({$or: [{username}, {email}]});
+    const user = await User.findOne({$or: [{firstname}, {lastname}, {email}]});
 
     if(user) {
       return res.status(400).json({
@@ -19,7 +19,8 @@ const registerUser = async(req, res) => {
 
     //Create the user or register the user
     const newUser = await User.create({
-      username,
+      firstname,
+      lastname,
       email,
       password,
       address,
@@ -43,10 +44,10 @@ const registerUser = async(req, res) => {
 const loginUser = async(req, res) => {
   try{
 
-    const {username, password} = req.body;
+    const {firstname, password} = req.body;
 
     //Check if it is correct
-    const user = await User.findOne({username}).select('+password');
+    const user = await User.findOne({firstname}).select('+password');
 
     if(!user) {
       return res.status(401).json({

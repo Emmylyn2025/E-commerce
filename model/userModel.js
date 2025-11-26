@@ -2,9 +2,14 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-  username: {
+  firstname: {
     type: String,
-    required: [true, 'Username is required'],
+    required: [true, 'firstname is required'],
+    minlength: 6
+  },
+  lastname: {
+    type: String,
+    required: [true, 'lastname is required'],
     minlength: 6
   },
   email: {
@@ -33,7 +38,17 @@ const userSchema = new mongoose.Schema({
     required: true,
     maxlength: 11
   }
-}, {timestamps: true});
+}, 
+{timestamps: true});
+
+//Make the fullname field a virtual Property
+userSchema.virtual('fullname').get(function() {
+  return `${this.firstname} ${this.lastname}`;
+});
+
+//Make it show in the json response
+userSchema.set("toJSON", {virtuals: true});
+userSchema.set("toObject", {virtuals: true});
 
 
 //Hash password before saving
