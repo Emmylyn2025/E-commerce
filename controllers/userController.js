@@ -3,6 +3,7 @@ const {generateToken, sendRefreshToken} = require('../token/token');
 const jwt = require('jsonwebtoken');
 
 const registerUser = async(req, res) => {
+  
   try{
 
     const {firstname, lastname, email, password, address, phone} = req.body;

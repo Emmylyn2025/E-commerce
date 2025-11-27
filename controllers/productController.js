@@ -6,7 +6,7 @@ const {uploadToCloudinary} = require('../Cloudinary/cloudinaryHelpers');
 const addProductToDatabase = async(req, res) => {
   try{
 
-    const {name, description, price, category, brand} = JSON.parse(req.body.details);
+    const {name, description, price, category, brand, inStock} = JSON.parse(req.body.details);
 
     //Check if file is present
     if(!req.file) {
@@ -26,7 +26,8 @@ const addProductToDatabase = async(req, res) => {
       description,
       price,
       category,
-      brand
+      brand,
+      inStock
     });
 
     if(!product) {

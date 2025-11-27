@@ -35,10 +35,28 @@ const Product = new mongoose.Schema({
     default: "No brand",
     trim: true
   },
+  inStock: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now()
   }
 }, {timestamps: true});
 
+//Only return those products that their stock is true
+Product.pre('find', function(next) {
+  this.find({inStock: true});
+
+  next();
+});
+
+Product.post('save', function (doc, next) {
+  console.log(doc);
+  next();
+});
+
 module.exports = mongoose.model("products", Product);
+
