@@ -1,14 +1,6 @@
 const mongoose = require('mongoose');
 
 const Product = new mongoose.Schema({
-  imageUrl: {
-    type: String,
-    required: true
-  },
-  imagePublicId: {
-    type: String,
-    required: true
-  },
   name: {
     type: String,
     required: [true, "Product name is required"],
@@ -40,22 +32,31 @@ const Product = new mongoose.Schema({
     required: true,
     default: true
   },
+  imageUrl: {
+    type: String,
+    required: true
+  },
+  imagePublicId: {
+    type: String,
+    required: true
+  },
+  uploadedBy: {
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now()
   }
 }, {timestamps: true});
 
-//Only return those products that their stock is true
-Product.pre('find', function(next) {
-  this.find({inStock: true});
-
-  next();
+//The name of the admin that uploaded the product
+Product.pre('save', function() {
+  this.uploadedBy = 'admin';
 });
 
-Product.post('save', function (doc, next) {
-  console.log(doc);
-  next();
+//This makes the inStock: false product not to appear in response
+Product.pre('find', function() {
+  this.find({inStock: true});
 });
 
 module.exports = mongoose.model("products", Product);

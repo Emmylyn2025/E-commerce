@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { addProductToDatabase, getProducts, updateProduct, deleteProduct, getProductsStats } = require('../controllers/productController');
+const { addProductToDatabase, getProducts, updateProduct, deleteProduct, getProductFalse } = require('../controllers/productController');
 
 const {registerUser, loginUser, refresh, logOut, decodeToken} = require('../controllers/userController');
 
@@ -22,7 +22,7 @@ router.get('/decode', authController, decodeToken);
 //Admin ability routes
 router.post('/addproduct', authController, adminController, multerMiddleware.single('image'), addProductToDatabase);
 router.get('/getproduct', getProducts);
-router.get('/stats', authController, adminController, getProductsStats);
+router.get('/false', /*authController, adminController,*/ getProductFalse);
 router.patch('/updateproduct/:id', authController, adminController, updateProduct);
 router.delete('/deleteproduct/:id', authController, adminController, deleteProduct);
 
