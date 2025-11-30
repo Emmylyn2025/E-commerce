@@ -41,7 +41,8 @@ const Product = new mongoose.Schema({
     required: true
   },
   uploadedBy: {
-    type: String
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users"
   },
   createdAt: {
     type: Date,
@@ -50,9 +51,9 @@ const Product = new mongoose.Schema({
 }, {timestamps: true});
 
 //The name of the admin that uploaded the product
-Product.pre('save', function() {
-  this.uploadedBy = 'admin';
-});
+// Product.pre('save', function() {
+//   this.uploadedBy = 'admin';
+// });
 
 //This makes the inStock: false product not to appear in response
 Product.pre('find', function() {

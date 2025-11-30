@@ -32,7 +32,8 @@ const addProductToDatabase = async(req, res) => {
       price,
       category,
       brand,
-      inStock
+      inStock,
+      uploadedBy: req.userInfo.id
     });
 
     if(!product) {
@@ -70,7 +71,7 @@ const getProducts = async(req, res) => {
     //Make express understand
     const parse = qs.parse(req.query);
 
-    const features = new apiFeatures(Product.find(), parse)
+    const features = new apiFeatures(Product.find().populate("uploadedBy", "firstname"), parse)
       .filter()
       .sort()
       .limitFields()
@@ -166,7 +167,7 @@ const updateProduct = async(req, res) => {
     //const product = await Product.findByIdAndUpdate(productId, req.body, {new: true, runValidators: true});
 
     const product = await Product.findById(productId);
-    //console.log(product.name);
+    
     if(!product) {
       return res.status(404).json({
         status: 'fail',
@@ -174,17 +175,18 @@ const updateProduct = async(req, res) => {
       });
     }
 
-  /*
+  
     if(req.file) {
       product.imageUrl = req.file.imageUrl;
       product.imagePublicId = req.file.imagePublicId;
     }
-  */
+  
+    
     product.name = req.body.name || product.name;
     product.price = req.body.price || product.price;
     product.description = req.body.description || product.description;
     product.inStock = req.body.inStock || product.inStock;
-
+    
     await product.save();
 
     res.status(200).json({
