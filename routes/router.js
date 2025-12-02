@@ -4,6 +4,8 @@ const { addProductToDatabase, getProducts, updateProduct, deleteProduct, getProd
 
 const {registerUser, loginUser, refresh, logOut, decodeToken, forgetPassword, resetPassword} = require('../controllers/userController');
 
+const {addToCart, removeFromCart, updateCartQuantity, calculateCartPriceQuantity} = require('../controllers/cartController');
+
 const {authController, adminController} = require('../Middleware/userMiddleware');
 
 const multerMiddleware = require('../multer/multer');
@@ -16,7 +18,13 @@ router.post('/login', loginUser);
 router.post('/refresh', refresh);
 router.post('/logout', logOut);
 router.post('/forget', forgetPassword);
-router.patch('/resetpassword/:token', resetPassword)
+router.patch('/resetpassword/:token', resetPassword);
+
+//Cart routes
+router.post('/addtocart', authController, addToCart);
+router.post('/removefromcart', authController, removeFromCart);
+router.post('/updatequantity', authController, updateCartQuantity);
+router.get('/totalAmout', authController, calculateCartPriceQuantity);
 
 //For the frontend developer
 router.get('/decode', authController, decodeToken);

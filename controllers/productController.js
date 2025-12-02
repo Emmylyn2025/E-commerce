@@ -71,7 +71,7 @@ const getProducts = async(req, res) => {
     //Make express understand
     const parse = qs.parse(req.query);
 
-    const features = new apiFeatures(Product.find().populate("uploadedBy", "firstname"), parse)
+    const features = new apiFeatures(Product.find().populate("uploadedBy"), parse)
       .filter()
       .sort()
       .limitFields()
