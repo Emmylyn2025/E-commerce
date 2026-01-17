@@ -3,22 +3,15 @@ const qs = require('qs');
 const apiFeatures = require('../utils/apiFeatures');
 const {uploadToCloudinary} = require('../Cloudinary/cloudinaryHelpers');
 const fs = require('fs');
-const path = require('path');
 const cloudinary = require('cloudinary').v2;
+const {asyncHandler, appError} = require('../utils/errorHandler');
 
-const addProductToDatabase = async(req, res) => {
-  try{
-
+const addProductToDatabase = asyncHandler(async(req, res, next) => {
     const {name, description, price, category, brand, inStock} = req.body;
-    const fileName = req.file.filename;
-    const filePath = path.join(__dirname, '../uploads', fileName);
 
     //Check if file is present
     if(!req.file) {
-      return res.status(400).json({
-        status: 'Fail',
-        message: "An image needs to be uploaded"
-      });
+      return next(new appError("An image needs to be uploaded", 400));
     }
 
     //Upload to cloudinary
@@ -37,37 +30,18 @@ const addProductToDatabase = async(req, res) => {
     });
 
     if(!product) {
-      return res.status(400).json({
-        success: 'Fail',
-        message: "You've made some bad request"
-      });
+      return next(new appError("You've made some bad request", 400));
     }
-
-    fs.unlink(filePath, (err) => {
-      if(err) {
-        console.log('Error while deleting image');
-      } else {
-        console.log('image deleted successfully');
-      }
-    })
 
     res.status(201).json({
       message: "product created successfully",
       product
     });
 
+    fs.unlinkSync(req.file.path);
+});
 
-  } catch(error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Something went wrong please try gaian later"
-    });
-  }
-}
-
-const getProducts = async(req, res) => {
-  try{
+const getProducts = asyncHandler(async(req, res, next) => {
     //Make express understand
     const parse = qs.parse(req.query);
 
@@ -127,18 +101,9 @@ const getProducts = async(req, res) => {
       product
     });
 
-  } catch(error) {
-    console.log(error);
+});
 
-    res.status(500).json({
-      message: "Something went wrong please try again later"
-    });
-  }
-}
-
-
-const getProductFalse = async(req, res) => {
-  try{
+const getProductFalse = asyncHandler(async(req, res) => {
     const stats = await Product.aggregate([
       { $match: {inStock: false}}
     ]);
@@ -150,18 +115,9 @@ const getProductFalse = async(req, res) => {
         stats
       }
     });
+});
 
-  } catch(error) {
-    res.status(500).json({
-      status: 'fail',
-      message: error.message
-    });
-  }
-}
-
-const updateProduct = async(req, res) => {
-  try{
-
+const updateProduct = asyncHandler(async(req, res, next) => {
     const productId = req.params.id;
 
     //const product = await Product.findByIdAndUpdate(productId, req.body, {new: true, runValidators: true});
@@ -169,10 +125,7 @@ const updateProduct = async(req, res) => {
     const product = await Product.findById(productId);
     
     if(!product) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Product not found'
-      });
+      return next(new appError('Product not found', 404));
     }
 
   
@@ -193,37 +146,16 @@ const updateProduct = async(req, res) => {
       status: 'success',
       message: 'Product updated successfully'
     });
+});
 
-
-    if(!product) {
-      return res.status(400).json({
-        message: "Product cannot be updatated"
-      });
-    }
-
-    res.status(200).json(product);
-
-  } catch(error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Something went wrong please try again later"
-    });
-  }
-}
-
-const deleteProduct = async(req, res) => {
-  try{
-
+const deleteProduct = asyncHandler(async(req, res, next) => {
     const productId = req.params.id;
 
     const product = await Product.findByIdAndDelete(productId);
     const imagePublicId = product.imagePublicId;
 
     if(!product) {
-      return res.status(404).json({
-        message: "Product not found"
-      });
+      return next(new appError("Product not found", 404));
     }
 
     //Delete product image from cloudinary
@@ -232,14 +164,6 @@ const deleteProduct = async(req, res) => {
     res.status(200).json({
       message: "Product deleted successfully"
     });
-
-  } catch(error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Something went wrong please try again later"
-    });
-  }
-}
+});
 
 module.exports = { addProductToDatabase, getProducts, updateProduct, deleteProduct, getProductFalse };

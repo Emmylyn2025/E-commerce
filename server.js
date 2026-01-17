@@ -3,7 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = require('./routes/router');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
+const {corsConfigure} = require('./cors-configure/cors');
+const {appError} = require('./utils/errorHandler');
+
 
 const app = express();
 
@@ -17,8 +19,25 @@ mongoose.connect(process.env.monCONN).then(() => {
 //Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(corsConfigure());
+
+
 app.use('/api/e-commerce', router);
+
+//Not found error handler
+app.use((req, res, next) => {
+  next(new appError(`Can't find ${req.originalUrl} on the server`), 404);
+});
+
+//Global error handler
+app.use((error, req, res, next) => {
+  error.status = error.status || 'error';
+  error.statusCode = error.StatusCode || 500;
+  res.status(error.statusCode).json({
+    status: error.status,
+    message: error.message,
+  });
+});
 
 const PORT = process.env.PORT;
 

@@ -69,6 +69,7 @@ userSchema.methods.correctPassword = async function(inputPassword, savedPassword
   return await bcrypt.compare(inputPassword, savedPassword);
 };
 
+//Generate refresh password token
 userSchema.methods.createResetPasswordToken = function() {
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
